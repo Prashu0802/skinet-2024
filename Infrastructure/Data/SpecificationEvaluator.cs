@@ -17,23 +17,32 @@ namespace Infrastructure.Data
                 query=query.Where(Spec.Criteria);
             }
 
-            if (Spec.OrderBy != null) 
-            { 
-                query=query.OrderBy(Spec.OrderBy);
+            if (Spec.OrderBy != null)
+            {
+                query = query.OrderBy(Spec.OrderBy);
             }
 
             if (Spec.OrderByDesending != null)
             {
-                query=query.OrderByDescending(Spec.OrderByDesending);
-            }
-            if (Spec.IsDistinct)
-            {
-                query=query.Distinct();
+                query = query.OrderByDescending(Spec.OrderByDesending);
             }
 
+            if (Spec.IsDistinct)
+            {
+                query = query.Distinct();
+            }
+
+            if (Spec.IsPagingEnabled)
+            {
+                query = query.Skip(Spec.Skip).Take(Spec.Take);
+            }
+            //if (Spec.Criteria != null)
+            //{
+            //    query = query.Where(Spec.Criteria);
+            //}
             return query;
         }
-        public static IQueryable<TResult> GetQuery<TSpec,TResult>(IQueryable<T> query, Ispecification<T,TResult> Spec)
+        public static IQueryable<TResult> GetQuery<TSpec,TResult>(IQueryable<T> query, ISpecification<T,TResult> Spec)
         {
             if (Spec.Criteria != null)
             {
@@ -60,8 +69,12 @@ namespace Infrastructure.Data
             {
                 selectQuery = selectQuery?.Distinct();
             }
+            if (Spec.IsPagingEnabled)
+            {
+                selectQuery = selectQuery?.Skip(Spec.Skip).Take(Spec.Take);
+            }
 
-           return selectQuery ?? query.Cast<TResult>();
+            return selectQuery ?? query.Cast<TResult>();
         }
     }
 }
